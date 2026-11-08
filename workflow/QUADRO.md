@@ -84,9 +84,9 @@ Estado: 78/78 testes. **Lote 1 (itens 1, 2 e 4) feito em `src/layout.js`**: troc
 
 ### Outros
 3. Offset caneta↔bico não medido (`offsetX/Y = 0`) — exige teste físico; maior impacto real.
-4. `EMSSpaceRocks` sem acentos (descartar ou avisar na UI).
-5. Sem teste de UI (`src/ui-*.js`, maior: `ui-personagem.js` 292 linhas) — só verificação manual.
-6. Desempenho: `compor` roda inteiro a cada slider; cronometrar com página cheia + mistura de fontes (não medido).
+4. ~~`EMSSpaceRocks` sem acentos~~ FEITO: a tabela de fontes mostra "sem acentos" (usa `SEM_ACENTOS` de `src/fonte.js`).
+5. ~~Sem teste de UI~~ FEITO: roteiro manual em `test/ui-smoke.md`, rodado no navegador (5/5 ok). Sem automação (ceiling: virar script Playwright se incomodar).
+6. ~~Desempenho~~ MEDIDO: `compor` com A4 cheia, 3 fontes, variacao=1: mediana 43 ms, pior 60 ms. Sem correção necessária.
 7. `otimizar` guloso, início fixo em (0,0) (já marcado `ponytail:`); só mexer se a viagem pesar.
 
 ### Higiene
