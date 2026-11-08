@@ -1,6 +1,7 @@
 import { CATALOGO, EIXOS, ARQUETIPOS } from './catalogo.js';
 import { glifo, NEUTRA } from './mao.js';
 import { ajuda } from './ajuda.js';
+import { SEM_ACENTOS } from './fonte.js';
 
 const SVG = 'http://www.w3.org/2000/svg';
 const FRASE = 'Prezado Senhor, ação!';
@@ -129,7 +130,7 @@ function linha(f, arq) {
   nome.className = 'nome';
   nome.append(f.fonte, ' ');
   const familia = document.createElement('small');
-  familia.textContent = '· família ' + f.familia;
+  familia.textContent = '· família ' + f.familia + (SEM_ACENTOS.includes(f.fonte) ? ' · sem acentos' : '');
   nome.append(familia);
   celula(nome, 'amostra').append(amostra(contexto.estado, f.fonte));
   celula(f.ligacao);

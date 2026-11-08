@@ -1,7 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { CATALOGO, EIXOS, ARQUETIPOS } from '../src/catalogo.js';
-import { FONTES } from '../src/fonte.js';
+import { FONTES, SEM_ACENTOS } from '../src/fonte.js';
+
+test('SEM_ACENTOS só lista fontes do catálogo', () => {
+  for (const n of SEM_ACENTOS) assert.ok(CATALOGO.some(f => f.fonte === n), n);
+});
 
 test('FONTES e CATALOGO têm os mesmos nomes, sem duplicatas', () => {
   const nomes = CATALOGO.map(f => f.fonte);
