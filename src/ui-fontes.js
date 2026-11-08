@@ -1,18 +1,21 @@
 import { mutar } from './mao.js';
+import { rotulo, ajuda } from './ajuda.js';
+import { abrirCatalogo } from './ui-catalogo.js';
 
-function titulo(texto) {
+function titulo(texto, chave) {
   const h = document.createElement('h3');
-  h.textContent = texto;
+  h.append(texto);
+  if (chave) h.append(' ', ajuda(chave));
   return h;
 }
 
-function rotulo(texto, controle) {
+function campo(chave, controle) {
   const l = document.createElement('label');
-  l.append(texto + ' ', controle);
+  l.append(rotulo(chave), ' ', ajuda(chave), ' ', controle);
   return l;
 }
 
-function deslizante(texto, min, max, passo, valor) {
+function deslizante(chave, min, max, passo, valor) {
   const input = document.createElement('input');
   input.type = 'range';
   input.min = min;
@@ -21,9 +24,11 @@ function deslizante(texto, min, max, passo, valor) {
   input.value = valor;
   const saida = document.createElement('output');
   saida.textContent = String(valor);
+  const t = document.createElement('span');
+  t.append(rotulo(chave), ' ', ajuda(chave));
   const l = document.createElement('label');
   l.className = 'slider';
-  l.append(texto + ' ', input, ' ', saida);
+  l.append(t, input, ' ', saida);
   return { rotulo: l, input, saida };
 }
 
@@ -64,7 +69,7 @@ export function montar(elemento, estado, aoMudar) {
     });
 
     const linha = document.createElement('div');
-    linha.append(rotulo('fonte', sel), peso.rotulo, remover);
+    linha.append(campo('base', sel), peso.rotulo, remover);
     return { linha, sel, peso, remover };
   }
 
@@ -91,7 +96,7 @@ export function montar(elemento, estado, aoMudar) {
   seedMutar.step = 1;
   seedMutar.value = 1;
 
-  const forca = deslizante('força', 0, 1, 0.05, 0.3);
+  const forca = deslizante('mutarForca', 0, 1, 0.05, 0.3);
   forca.input.addEventListener('input', () => {
     forca.saida.textContent = forca.input.value;
   });
@@ -105,13 +110,19 @@ export function montar(elemento, estado, aoMudar) {
     aoMudar();
   });
 
+  const tabela = document.createElement('button');
+  tabela.type = 'button';
+  tabela.textContent = 'Tabela de fontes';
+  tabela.addEventListener('click', () => abrirCatalogo(estado, aoMudar));
+
   elemento.replaceChildren(
-    titulo('Fontes da mão'),
+    titulo('Fontes da mão', 'base'),
+    tabela,
     lista,
     adicionar,
-    rotulo('Seed da mão', seedMao),
-    titulo('Mutar'),
-    rotulo('Seed da mutação', seedMutar),
+    campo('seed', seedMao),
+    titulo('Mutar', 'mutarForca'),
+    campo('mutarSeed', seedMutar),
     forca.rotulo,
     botaoMutar,
   );

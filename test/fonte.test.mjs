@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { parseFonte, FONTES } from '../src/fonte.js';
+import { parseFonte, FONTES, SEM_ACENTOS } from '../src/fonte.js';
 
 const lerFonte = (n) => fs.readFileSync(new URL('../fontes/' + n + '.svg', import.meta.url), 'utf8');
 
@@ -9,8 +9,8 @@ const lerFonte = (n) => fs.readFileSync(new URL('../fontes/' + n + '.svg', impor
 const sintetico = (glifos, tagFonte = '<font id="X" horiz-adv-x="500" >') =>
   `<svg>${tagFonte}<font-face units-per-em="1000" ascent="800" descent="-200" x-height="545" cap-height="680"/>${glifos}</font></svg>`;
 
-test('FONTES tem 11 nomes e cada arquivo existe', () => {
-  assert.equal(FONTES.length, 11);
+test('FONTES tem 43 nomes únicos e cada arquivo existe', () => {
+  assert.equal(new Set(FONTES).size, 43);
   for (const n of FONTES) assert.ok(fs.existsSync(new URL('../fontes/' + n + '.svg', import.meta.url)), n);
 });
 
@@ -23,8 +23,8 @@ test('cada fonte real é parseada com upm, nome e >= 60 glifos', () => {
   }
 });
 
-test('EMS: acentos têm traços', () => {
-  for (const n of FONTES.filter((n) => n.startsWith('EMS'))) {
+test('acentos têm traços (exceto SEM_ACENTOS)', () => {
+  for (const n of FONTES.filter((n) => !SEM_ACENTOS.includes(n))) {
     const f = parseFonte(lerFonte(n), n);
     for (const ch of ['á', 'ã', 'ç', 'é', 'ê', 'õ']) {
       assert.ok(f.glifos[ch], n + ' ' + ch);

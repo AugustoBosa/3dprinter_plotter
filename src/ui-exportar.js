@@ -1,15 +1,17 @@
 import { PERFIL_PADRAO, svg, otimizar, gcode } from './exportar.js';
+import { rotulo, ajuda } from './ajuda.js';
 
+// Chave do campo = chave de estado.perfil = chave de ajuda.
 const CAMPOS = [
-  ['zEscrita', 'Z escrita (mm)', 0.1],
-  ['zLevantada', 'Z levantada (mm)', 0.1],
-  ['fDesenho', 'Velocidade de desenho F', 1],
-  ['fViagem', 'Velocidade de viagem F', 1],
-  ['fZ', 'Velocidade do Z F', 1],
-  ['offsetX', 'Offset X da caneta (mm)', 0.1],
-  ['offsetY', 'Offset Y da caneta (mm)', 0.1],
-  ['mesaX', 'Mesa X (mm)', 1],
-  ['mesaY', 'Mesa Y (mm)', 1],
+  ['zEscrita', 0.1],
+  ['zLevantada', 0.1],
+  ['fDesenho', 1],
+  ['fViagem', 1],
+  ['fZ', 1],
+  ['offsetX', 0.1],
+  ['offsetY', 0.1],
+  ['mesaX', 1],
+  ['mesaY', 1],
 ];
 
 const tracosAtuais = (estado) => {
@@ -26,9 +28,9 @@ function baixar(conteudo, nome, tipo) {
 export function montar(elemento, estado, aoMudar) {
   const sincs = [];
 
-  const rotulo = (texto, controle) => {
+  const linha = (chave, controle) => {
     const l = document.createElement('label');
-    l.append(texto + ' ', controle);
+    l.append(rotulo(chave), ' ', ajuda(chave), ' ', controle);
     elemento.append(l);
   };
 
@@ -40,7 +42,7 @@ export function montar(elemento, estado, aoMudar) {
     elemento.append(b);
   };
 
-  for (const [chave, texto, passo] of CAMPOS) {
+  for (const [chave, passo] of CAMPOS) {
     const input = document.createElement('input');
     input.type = 'number';
     input.step = passo;
@@ -49,13 +51,13 @@ export function montar(elemento, estado, aoMudar) {
       estado.perfil[chave] = Number(input.value);
       aoMudar();
     });
-    rotulo(texto, input);
+    linha(chave, input);
     sincs.push(() => {
       if (Number(input.value) !== estado.perfil[chave]) input.value = estado.perfil[chave];
     });
   }
 
-  for (const [chave, texto] of [['header', 'Header G-code'], ['footer', 'Footer G-code']]) {
+  for (const chave of ['header', 'footer']) {
     const ta = document.createElement('textarea');
     ta.rows = 5;
     ta.style.fontFamily = 'monospace';
@@ -63,7 +65,7 @@ export function montar(elemento, estado, aoMudar) {
       estado.perfil[chave] = ta.value;
       aoMudar();
     });
-    rotulo(texto, ta);
+    linha(chave, ta);
     sincs.push(() => {
       if (ta.value !== estado.perfil[chave]) ta.value = estado.perfil[chave];
     });
@@ -75,7 +77,7 @@ export function montar(elemento, estado, aoMudar) {
     estado.otimizar = otim.checked;
     aoMudar();
   });
-  rotulo('Otimizar ordem dos traços', otim);
+  linha('otimizar', otim);
 
   botao('Restaurar perfil padrão', () => {
     estado.perfil = structuredClone(PERFIL_PADRAO);

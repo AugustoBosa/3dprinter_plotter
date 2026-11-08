@@ -90,3 +90,26 @@ personagens/*.json  presets (Personagem)
 - [ ] prévia SVG atualiza ao mudar qualquer controle; navegação entre páginas.
 - [ ] comparação lado a lado de duas variações do mesmo personagem.
 - [ ] zero erros no console; fluxo completo verificado pelo orquestrador no navegador.
+
+## Fase 2 (pedido do usuário, 2026-11-08)
+
+Exceção ao contrato: `src/ui-*.js` podem usar DOM. Arquivos novos permitidos: `src/catalogo.js` (escrito pelo orquestrador — só leitura para workers), `src/ajuda.js`, `src/ui-catalogo.js`, `test/catalogo.test.mjs`, `test/ajuda.test.mjs`.
+
+### M7 Sem presets — personagens criados pelo usuário
+- [ ] `personagens/` e `PRESET_IDS` removidos; nenhum `fetch` de preset. Testes que liam presets passam a usar personagem inline (fixture no próprio teste).
+- [ ] App abre com um personagem em branco ("Novo personagem", `NEUTRA` sobre base `EMSDelight`, variação `normal` vazia).
+- [ ] UI: botão Novo personagem; nome editável; adicionar, renomear e remover variação (variação guarda só as chaves de EXECUCAO que diferem da mão); lista de personagens salvos no localStorage (salvar, abrir, excluir); Salvar/Abrir JSON continuam.
+- [ ] `node --test` verde.
+
+### M8 Tabela de fontes (catálogo)
+- [ ] `test/catalogo.test.mjs`: todo nome de `FONTES` tem entrada em `CATALOGO` e vice-versa; eixos 1–5 e aptidões 0–3 inteiros; chaves iguais a `EIXOS` e `ARQUETIPOS`.
+- [ ] No painel Fontes, botão "Tabela de fontes" abre um `<dialog>` (`src/ui-catalogo.js`) com uma linha por fonte: amostra renderizada (SVG de "Prezado Senhor, ação!" com a própria fonte), família, ligação, os 5 eixos (barra ou ●●●○○), aptidões por arquétipo (★), descrição.
+- [ ] Filtro por arquétipo (ordena por aptidão desc. e destaca as aptas ≥ 2) e ordenação por qualquer eixo.
+- [ ] Cada linha tem "Usar" (vira a base da mão) e "Misturar" (adiciona à mistura com peso 0.5); a prévia atualiza.
+- [ ] Cabeçalhos dos eixos e arquétipos com o ícone de ajuda (M9) usando os textos `ajuda` de `catalogo.js`.
+
+### M9 Ajuda em cada configuração
+- [ ] `src/ajuda.js` exporta `AJUDA = {[chave]: texto}` cobrindo: todas as chaves de IDENTIDADE e EXECUCAO, mistura/peso/mutar/seed, página, margens, tamanho, entrelinha, alinhamento, comparar, offset X/Y, Z escrita/levantada, velocidades, header/footer. Texto curto em pt-BR simples: o que faz, faixa de valores e efeito visível na letra.
+- [ ] `test/ajuda.test.mjs`: toda chave de IDENTIDADE e EXECUCAO tem texto não vazio.
+- [ ] Cada controle da UI tem ao lado um "?" circulado (`<span class="ajuda" tabindex="0" data-ajuda="...">?</span>`) que mostra o texto ao passar o mouse e ao focar pelo teclado (CSS, sem biblioteca). Rótulos legíveis no lugar das chaves cruas (ex.: "espaço entre palavras" em vez de `espacoPalavra`).
+- [ ] Verificação no navegador pelo orquestrador: console limpo, tooltip visível, nenhum controle sem "?".

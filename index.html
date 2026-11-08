@@ -29,6 +29,12 @@ select { max-width: 100%; }
 textarea { width: 100%; }
 button { padding: 4px 10px; cursor: pointer; }
 button:disabled { cursor: default; opacity: .45; }
+input[type=text] { max-width: 100%; }
+.linha-botoes { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.ajuda { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; margin-left: 2px; border: 1px solid #777; border-radius: 50%; background: #fff; color: #555; font-size: 11px; font-weight: 700; line-height: 1; cursor: help; vertical-align: middle; user-select: none; }
+.ajuda::after { content: attr(data-ajuda); display: none; position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(calc(-50% + var(--dx, 0px))); width: 220px; padding: 6px 8px; border-radius: 4px; background: var(--tinta); color: #fff; font-size: 12px; font-weight: 400; line-height: 1.35; text-align: left; white-space: normal; pointer-events: none; z-index: 30; }
+.ajuda:hover::after, .ajuda:focus::after { display: block; }
+.ajuda:focus { outline: 2px solid #1b5fc4; outline-offset: 1px; }
 .direita { min-width: 0; }
 .barra { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 12px; }
 .barra label { display: inline-flex; align-items: center; gap: 6px; margin: 0; }
@@ -89,25 +95,23 @@ figure { margin: 0; min-width: 0; }
 import { parseFonte, FONTES } from './src/fonte.js';
 import { PAGINAS, compor } from './src/layout.js';
 import { PERFIL_PADRAO, svg } from './src/exportar.js';
-import { resolver } from './src/personagem.js';
+import { resolver, novoPersonagem } from './src/personagem.js';
+import { ajuda } from './src/ajuda.js';
 import * as pPersonagem from './src/ui-personagem.js';
 import * as pFontes from './src/ui-fontes.js';
 import * as pTexto from './src/ui-texto.js';
 import * as pExportar from './src/ui-exportar.js';
 
 const $ = (id) => document.getElementById(id);
-const PRESET_IDS = ['strahd', 'kolyan', 'van-richten', 'fiona'];
 const IDS_PAINEIS = ['painel-personagem', 'painel-fontes', 'painel-texto', 'painel-exportar'];
 
 const estado = {
   fontes: {},
   nomesFontes: FONTES,
-  presets: {},
-  presetId: 'strahd',
   personagem: null,
-  variacao: 'formal',
+  variacao: 'normal',
   comparar: false,
-  variacaoB: 'apressado',
+  variacaoB: 'normal',
   texto: 'Caro viajante,\n\nA neblina cobre Barovia e o castelo espera por você. Venha antes do pôr do sol.',
   paginaNome: 'A5',
   pagina: structuredClone(PAGINAS.A5),
@@ -197,24 +201,23 @@ async function iniciar() {
     const fontes = await Promise.all(FONTES.map(async (nome) =>
       parseFonte(await (await baixar(`fontes/${nome}.svg`)).text(), nome)));
     FONTES.forEach((nome, i) => { estado.fontes[nome] = fontes[i]; });
-    const presets = await Promise.all(PRESET_IDS.map(async (id) =>
-      (await baixar(`personagens/${id}.json`)).json()));
-    PRESET_IDS.forEach((id, i) => { estado.presets[id] = presets[i]; });
   } catch (e) {
     $('erro').textContent = `Erro ao carregar: ${e.message}`;
     return;
   }
 
-  estado.personagem = structuredClone(estado.presets[estado.presetId]);
-  estado.variacao = 'formal';
-  try { pPersonagem.restaurar(estado); } catch { /* ignora: usa o preset */ }
+  estado.personagem = novoPersonagem();
+  estado.variacao = 'normal';
+  estado.variacaoB = 'normal';
+  try { pPersonagem.restaurar(estado); } catch { /* ignora: usa personagem novo */ }
 
   paineis = [pPersonagem, pFontes, pTexto, pExportar].map((m, i) =>
     m.montar($(IDS_PAINEIS[i]), estado, aoMudar));
   renderizar();
 }
 
-$('comparar').addEventListener('change', (e) => { estado.comparar = e.target.checked; aoMudar(); });
+$('comparar').parentElement.append(' ', ajuda('comparar'));
+$('comparar').addEventListener('change',(e) => { estado.comparar = e.target.checked; aoMudar(); });
 $('variacao-b').addEventListener('change', (e) => { estado.variacaoB = e.target.value; aoMudar(); });
 $('pag-ant').addEventListener('click', () => { estado.paginaAtual -= 1; aoMudar(); });
 $('pag-prox').addEventListener('click', () => { estado.paginaAtual += 1; aoMudar(); });

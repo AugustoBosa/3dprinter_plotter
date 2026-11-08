@@ -4,7 +4,16 @@ export const FONTES = [
   'EMSAllure', 'EMSBird', 'EMSBirdSwashCaps', 'EMSDecorousScript', 'EMSDelight',
   'EMSDelightSwashCaps', 'EMSInvite', 'EMSLittlePrincess', 'EMSMistyNight', 'EMSSociety',
   'ReliefSingleLineSVG-Regular',
+  'EMSBrush', 'EMSCapitol', 'EMSCasualHand', 'EMSElfin', 'EMSFelix', 'EMSHerculean', 'EMSLeague',
+  'EMSNeato', 'EMSNixish', 'EMSNixishItalic', 'EMSOsmotron', 'EMSPancakes', 'EMSPepita', 'EMSQwandry',
+  'EMSReadability', 'EMSReadabilityItalic', 'EMSSpaceRocks', 'EMSSwiss', 'EMSTech',
+  'HersheyGothEnglish', 'HersheyGothGerman', 'HersheyGothItalian', 'HersheySans1', 'HersheySansMed',
+  'HersheyScript1', 'HersheyScriptMed', 'HersheySerifBold', 'HersheySerifBoldItalic', 'HersheySerifMed',
+  'HersheySerifMedItalic', 'MistralSingleLine', 'TwinSans',
 ];
+
+// Fontes sem acentos (só maiúsculas ASCII).
+export const SEM_ACENTOS = ['EMSSpaceRocks'];
 
 const ENTIDADES = { amp: '&', quot: '"', lt: '<', gt: '>', apos: "'" };
 

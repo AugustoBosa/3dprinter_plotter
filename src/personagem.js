@@ -45,3 +45,23 @@ export function validar(p) {
   }
   return erros;
 }
+
+// Personagem em branco: NEUTRA sobre EMSDelight, variação 'normal' vazia.
+export function novoPersonagem(nome = 'Novo personagem') {
+  return { nome, mao: { ...structuredClone(NEUTRA), base: [{ fonte: 'EMSDelight', peso: 1 }] }, variacoes: { normal: {} } };
+}
+
+// Grava `valor` da chave de EXECUCAO. Sem variação (falsy): altera p.mao. Com variação: grava em p.variacoes[variacao],
+// mas se `valor` for igual a p.mao[chave], APAGA a chave da variação (variação guarda só o que difere da mão).
+// Lança erro se a chave não for de EXECUCAO ou a variação não existir.
+export function ajustarVariacao(p, variacao, chave, valor) {
+  if (!EXECUCAO.includes(chave)) throw new Error('chave de identidade: ' + chave);
+  if (!variacao) {
+    p.mao[chave] = valor;
+    return;
+  }
+  const extra = p.variacoes?.[variacao];
+  if (!extra) throw new Error('variação desconhecida: ' + variacao);
+  if (valor === p.mao[chave]) delete extra[chave];
+  else extra[chave] = valor;
+}

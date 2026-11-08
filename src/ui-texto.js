@@ -1,14 +1,16 @@
 import { PAGINAS } from './layout.js';
+import { rotulo, ajuda } from './ajuda.js';
 
-function titulo(texto) {
+function titulo(texto, chave) {
   const h = document.createElement('h3');
-  h.textContent = texto;
+  h.append(texto);
+  if (chave) h.append(' ', ajuda(chave));
   return h;
 }
 
-function rotulo(texto, controle) {
+function linha(chave, controle) {
   const l = document.createElement('label');
-  l.append(texto + ' ', controle);
+  l.append(rotulo(chave), ' ', ajuda(chave), ' ', controle);
   return l;
 }
 
@@ -43,13 +45,13 @@ export function montar(elemento, estado, aoMudar) {
   });
 
   const medidas = [
-    ['Largura (mm)', 20, () => estado.pagina, 'largura'],
-    ['Altura (mm)', 20, () => estado.pagina, 'altura'],
-    ['Margem superior (mm)', 0, () => estado.pagina.margens, 'topo'],
-    ['Margem direita (mm)', 0, () => estado.pagina.margens, 'dir'],
-    ['Margem inferior (mm)', 0, () => estado.pagina.margens, 'base'],
-    ['Margem esquerda (mm)', 0, () => estado.pagina.margens, 'esq'],
-  ].map(([texto, min, alvo, chave]) => {
+    ['larguraPagina', 20, () => estado.pagina, 'largura'],
+    ['alturaPagina', 20, () => estado.pagina, 'altura'],
+    ['margemTopo', 0, () => estado.pagina.margens, 'topo'],
+    ['margemDir', 0, () => estado.pagina.margens, 'dir'],
+    ['margemBase', 0, () => estado.pagina.margens, 'base'],
+    ['margemEsq', 0, () => estado.pagina.margens, 'esq'],
+  ].map(([chave, min, alvo, campo]) => {
     const input = document.createElement('input');
     input.type = 'number';
     input.min = min;
@@ -57,17 +59,17 @@ export function montar(elemento, estado, aoMudar) {
     input.addEventListener('input', () => {
       const n = Number(input.value);
       if (input.value === '' || Number.isNaN(n) || n < min) return;
-      alvo()[chave] = n;
+      alvo()[campo] = n;
       estado.paginaNome = 'personalizada';
       aoMudar();
     });
-    return { input, alvo, chave, linha: rotulo(texto, input) };
+    return { input, alvo, campo, linha: linha(chave, input) };
   });
 
   const deslizantes = [
-    ['Tamanho (mm do em)', 3, 15, 0.5, 'tamanho'],
-    ['Entrelinha', 1, 3, 0.05, 'entrelinha'],
-  ].map(([texto, min, max, passo, chave]) => {
+    ['tamanho', 3, 15, 0.5, 'tamanho'],
+    ['entrelinha', 1, 3, 0.05, 'entrelinha'],
+  ].map(([chave, min, max, passo, opcao]) => {
     const input = document.createElement('input');
     input.type = 'range';
     input.min = min;
@@ -75,13 +77,15 @@ export function montar(elemento, estado, aoMudar) {
     input.step = passo;
     const saida = document.createElement('output');
     input.addEventListener('input', () => {
-      estado.opcoes[chave] = Number(input.value);
+      estado.opcoes[opcao] = Number(input.value);
       aoMudar();
     });
+    const texto = document.createElement('span');
+    texto.append(rotulo(chave), ' ', ajuda(chave));
     const l = document.createElement('label');
     l.className = 'slider';
-    l.append(texto + ' ', input, ' ', saida);
-    return { input, saida, chave, linha: l };
+    l.append(texto, input, ' ', saida);
+    return { input, saida, opcao, linha: l };
   });
 
   const selAlinhamento = document.createElement('select');
@@ -97,23 +101,23 @@ export function montar(elemento, estado, aoMudar) {
   });
 
   elemento.replaceChildren(
-    titulo('Texto'),
+    titulo('Texto', 'texto'),
     textarea,
     titulo('Página'),
-    rotulo('Formato', selPagina),
+    linha('pagina', selPagina),
     ...medidas.map((m) => m.linha),
     titulo('Aparência'),
     ...deslizantes.map((d) => d.linha),
-    rotulo('Alinhamento', selAlinhamento),
+    linha('alinhamento', selAlinhamento),
   );
 
   return function atualizar() {
     if (textarea.value !== estado.texto) textarea.value = estado.texto;
     sincronizar(selPagina, estado.paginaNome);
-    for (const m of medidas) sincronizar(m.input, m.alvo()[m.chave]);
+    for (const m of medidas) sincronizar(m.input, m.alvo()[m.campo]);
     for (const d of deslizantes) {
-      sincronizar(d.input, estado.opcoes[d.chave]);
-      d.saida.textContent = String(estado.opcoes[d.chave]);
+      sincronizar(d.input, estado.opcoes[d.opcao]);
+      d.saida.textContent = String(estado.opcoes[d.opcao]);
     }
     sincronizar(selAlinhamento, estado.opcoes.alinhamento);
   };

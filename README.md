@@ -10,4 +10,4 @@ Abrir: https://augustobosa.github.io/3dprinter_plotter/ ou, local, `python -m ht
 
 Testes: `node --test` (Node 20+, sem dependências).
 
-Fontes em `fontes/`: EMS (SIL OFL, ver `fontes/OFL.txt`) e Relief SingleLine (SIL OFL).
+43 fontes de traço único em `fontes/` (EMS, Hershey, Relief, Mistral, TwinSans) — licenças e créditos em `fontes/LICENCAS.md`.
