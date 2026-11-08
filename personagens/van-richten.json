@@ -1,0 +1,25 @@
+{
+  "nome": "Rudolph van Richten",
+  "mao": {
+    "base": [{"fonte": "EMSDecorousScript", "peso": 1}],
+    "seed": 3003,
+    "inclinacao": 10,
+    "largura": 0.85,
+    "altura": 0.9,
+    "espacamento": -0.02,
+    "espacoPalavra": 0.1,
+    "idio": 0.2,
+    "pressa": 0.3,
+    "capricho": 0.7,
+    "tremor": 0,
+    "queda": 0,
+    "compressao": 1,
+    "variacao": 0.25,
+    "desleixo": 0.2
+  },
+  "variacoes": {
+    "formal": {"pressa": 0.1, "capricho": 0.95, "tremor": 0, "queda": 0, "compressao": 1, "variacao": 0.1, "desleixo": 0.05},
+    "apressado": {"pressa": 0.8, "capricho": 0.35, "tremor": 0.1, "queda": 0.3, "compressao": 0.88, "variacao": 0.5, "desleixo": 0.6},
+    "medo": {"pressa": 0.6, "capricho": 0.4, "tremor": 0.6, "queda": 0.2, "compressao": 0.92, "variacao": 0.7, "desleixo": 0.6}
+  }
+}

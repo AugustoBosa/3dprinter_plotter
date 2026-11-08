@@ -1,0 +1,25 @@
+{
+  "nome": "Kolyan Indirovich",
+  "mao": {
+    "base": [{"fonte": "EMSBird", "peso": 1}],
+    "seed": 2002,
+    "inclinacao": 3,
+    "largura": 1,
+    "altura": 1,
+    "espacamento": 0.03,
+    "espacoPalavra": 0.2,
+    "idio": 0.3,
+    "pressa": 0.2,
+    "capricho": 0.6,
+    "tremor": 0,
+    "queda": 0,
+    "compressao": 1,
+    "variacao": 0.3,
+    "desleixo": 0.3
+  },
+  "variacoes": {
+    "formal": {"pressa": 0.1, "capricho": 0.9, "tremor": 0, "queda": 0, "compressao": 1, "variacao": 0.15, "desleixo": 0.1},
+    "apressado": {"pressa": 0.7, "capricho": 0.3, "tremor": 0.1, "queda": 0.4, "compressao": 0.9, "variacao": 0.55, "desleixo": 0.6},
+    "cansaco": {"pressa": 0.1, "capricho": 0.4, "tremor": 0.4, "queda": 1.2, "compressao": 1, "variacao": 0.5, "desleixo": 0.5}
+  }
+}

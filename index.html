@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caligrafia para plotter</title>
+<style>
+:root { --cinza: #e7e7e3; --tinta: #1d1d1b; --borda: #c9c9c2; --erro: #b00020; color-scheme: light; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--cinza); color: var(--tinta); font: 15px/1.4 system-ui, sans-serif; }
+header { padding: 12px 16px; background: #fff; border-bottom: 1px solid var(--borda); }
+h1 { margin: 0; font-size: 20px; }
+.erro { margin: 4px 0 0; color: var(--erro); font-weight: 600; }
+.erro:empty { display: none; }
+main { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 16px; padding: 16px; align-items: start; }
+.esquerda { max-height: calc(100vh - 110px); overflow-y: auto; background: #fff; border: 1px solid var(--borda); border-radius: 6px; padding: 0 12px; }
+details { border-bottom: 1px solid var(--borda); padding: 8px 0; }
+details:last-child { border-bottom: 0; }
+summary { font-weight: 700; cursor: pointer; padding: 4px 0; }
+h3 { font-size: 14px; margin: 14px 0 4px; }
+label { display: block; margin: 6px 0; }
+label.slider { display: grid; grid-template-columns: 1fr 1.3fr 3.2em; align-items: center; gap: 8px; }
+label.slider output { text-align: right; font-variant-numeric: tabular-nums; }
+input, select, textarea, button { font: inherit; }
+input[type=range] { width: 100%; }
+input[type=number] { width: 6.5em; max-width: 100%; }
+select { max-width: 100%; }
+textarea { width: 100%; }
+button { padding: 4px 10px; cursor: pointer; }
+button:disabled { cursor: default; opacity: .45; }
+.direita { min-width: 0; }
+.barra { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 12px; }
+.barra label { display: inline-flex; align-items: center; gap: 6px; margin: 0; }
+.paginas { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+#previas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+#previas.comparando { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+figure { margin: 0; min-width: 0; }
+.rotulo { margin: 0 0 6px; font-weight: 600; color: #444; }
+.folha { background: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, .25); }
+.folha svg { display: block; width: 100%; height: auto; }
+#avisos { margin: 12px 0 0; padding-left: 20px; color: #6b4300; }
+#avisos:empty { display: none; }
+@media (max-width: 800px) {
+  main { grid-template-columns: 1fr; }
+  .esquerda { max-height: none; overflow: visible; }
+  #previas, #previas.comparando { grid-template-columns: 1fr; }
+  .paginas { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Caligrafia para plotter</h1>
+  <p id="erro" class="erro"></p>
+</header>
+<main>
+  <aside class="esquerda">
+    <details open><summary>Personagem</summary><div id="painel-personagem"></div></details>
+    <details open><summary>Fontes</summary><div id="painel-fontes"></div></details>
+    <details open><summary>Texto</summary><div id="painel-texto"></div></details>
+    <details open><summary>Exportar</summary><div id="painel-exportar"></div></details>
+  </aside>
+  <section class="direita">
+    <div class="barra">
+      <label><input type="checkbox" id="comparar"> Comparar duas variações</label>
+      <select id="variacao-b" aria-label="Variação B" hidden></select>
+      <nav class="paginas">
+        <button type="button" id="pag-ant">&larr; Anterior</button>
+        <span id="pag-info">Página 1 de 1</span>
+        <button type="button" id="pag-prox">Próxima &rarr;</button>
+      </nav>
+    </div>
+    <div id="previas">
+      <figure>
+        <p class="rotulo" id="rotulo-a"></p>
+        <div class="folha" id="previa"></div>
+      </figure>
+      <figure id="previa-b-bloco">
+        <p class="rotulo" id="rotulo-b" hidden></p>
+        <div class="folha" id="previa-b" hidden></div>
+      </figure>
+    </div>
+    <ul id="avisos"></ul>
+  </section>
+</main>
+
+<script type="module">
+import { parseFonte, FONTES } from './src/fonte.js';
+import { PAGINAS, compor } from './src/layout.js';
+import { PERFIL_PADRAO, svg } from './src/exportar.js';
+import { resolver } from './src/personagem.js';
+import * as pPersonagem from './src/ui-personagem.js';
+import * as pFontes from './src/ui-fontes.js';
+import * as pTexto from './src/ui-texto.js';
+import * as pExportar from './src/ui-exportar.js';
+
+const $ = (id) => document.getElementById(id);
+const PRESET_IDS = ['strahd', 'kolyan', 'van-richten', 'fiona'];
+const IDS_PAINEIS = ['painel-personagem', 'painel-fontes', 'painel-texto', 'painel-exportar'];
+
+const estado = {
+  fontes: {},
+  nomesFontes: FONTES,
+  presets: {},
+  presetId: 'strahd',
+  personagem: null,
+  variacao: 'formal',
+  comparar: false,
+  variacaoB: 'apressado',
+  texto: 'Caro viajante,\n\nA neblina cobre Barovia e o castelo espera por você. Venha antes do pôr do sol.',
+  paginaNome: 'A5',
+  pagina: structuredClone(PAGINAS.A5),
+  opcoes: { tamanho: 6, entrelinha: 1.6, alinhamento: 'esquerda' },
+  perfil: structuredClone(PERFIL_PADRAO),
+  otimizar: true,
+  paginaAtual: 0,
+  resultado: null,
+  resultadoB: null,
+};
+
+let paineis = [];
+
+async function baixar(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`não foi possível carregar ${url} (HTTP ${r.status})`);
+  return r;
+}
+
+function renderizar() {
+  if (!estado.personagem) return; // ainda carregando
+  const chaves = Object.keys(estado.personagem.variacoes ?? {});
+  if (!chaves.includes(estado.variacaoB)) {
+    estado.variacaoB = chaves.find((k) => k !== estado.variacao) ?? chaves[0] ?? '';
+  }
+  const selB = $('variacao-b');
+  const assinatura = chaves.join('|');
+  if (selB.dataset.chaves !== assinatura) {
+    selB.replaceChildren(...chaves.map((k) => new Option(k, k)));
+    selB.dataset.chaves = assinatura;
+  }
+  selB.value = estado.variacaoB;
+  for (const id of ['variacao-b', 'previa-b-bloco', 'rotulo-b', 'previa-b']) $(id).hidden = !estado.comparar;
+  $('previas').classList.toggle('comparando', estado.comparar);
+
+  try {
+    const mao = (v) => resolver(estado.personagem, v || null);
+    estado.resultado = compor(estado.texto, estado.fontes, mao(estado.variacao), estado.pagina, estado.opcoes);
+    estado.resultadoB = estado.comparar
+      ? compor(estado.texto, estado.fontes, mao(estado.variacaoB), estado.pagina, estado.opcoes)
+      : null;
+    $('erro').textContent = '';
+  } catch (e) {
+    $('erro').textContent = `Erro ao compor: ${e.message}`;
+    return;
+  }
+
+  const total = Math.max(1, estado.resultado.paginas.length, estado.resultadoB?.paginas.length ?? 0);
+  estado.paginaAtual = Math.min(Math.max(0, estado.paginaAtual), total - 1);
+  $('pag-info').textContent = `Página ${estado.paginaAtual + 1} de ${total}`;
+  $('pag-ant').disabled = estado.paginaAtual <= 0;
+  $('pag-prox').disabled = estado.paginaAtual >= total - 1;
+
+  $('rotulo-a').textContent = `Variação: ${estado.variacao || 'mão base'}`;
+  $('previa').innerHTML = svg(estado.resultado.paginas[estado.paginaAtual] ?? [], estado.pagina);
+  if (estado.comparar) {
+    $('rotulo-b').textContent = `Variação: ${estado.variacaoB || 'mão base'}`;
+    $('previa-b').innerHTML = svg(estado.resultadoB.paginas[estado.paginaAtual] ?? [], estado.pagina);
+  }
+
+  const naoTolerancia = (a) => !String(a).startsWith('tolerancia de limites');
+  const avisos = [
+    ...estado.resultado.avisos.filter(naoTolerancia),
+    ...(estado.comparar ? estado.resultadoB.avisos.filter(naoTolerancia).map((a) => `B: ${a}`) : []),
+  ];
+  $('avisos').replaceChildren(...avisos.map((texto) => {
+    const li = document.createElement('li');
+    li.textContent = texto;
+    return li;
+  }));
+
+  paineis.forEach((atualizar) => atualizar());
+}
+
+let agendado = false;
+function aoMudar() {
+  if (agendado) return;
+  agendado = true;
+  requestAnimationFrame(() => {
+    agendado = false;
+    renderizar();
+  });
+}
+
+async function iniciar() {
+  try {
+    const fontes = await Promise.all(FONTES.map(async (nome) =>
+      parseFonte(await (await baixar(`fontes/${nome}.svg`)).text(), nome)));
+    FONTES.forEach((nome, i) => { estado.fontes[nome] = fontes[i]; });
+    const presets = await Promise.all(PRESET_IDS.map(async (id) =>
+      (await baixar(`personagens/${id}.json`)).json()));
+    PRESET_IDS.forEach((id, i) => { estado.presets[id] = presets[i]; });
+  } catch (e) {
+    $('erro').textContent = `Erro ao carregar: ${e.message}`;
+    return;
+  }
+
+  estado.personagem = structuredClone(estado.presets[estado.presetId]);
+  estado.variacao = 'formal';
+  try { pPersonagem.restaurar(estado); } catch { /* ignora: usa o preset */ }
+
+  paineis = [pPersonagem, pFontes, pTexto, pExportar].map((m, i) =>
+    m.montar($(IDS_PAINEIS[i]), estado, aoMudar));
+  renderizar();
+}
+
+$('comparar').addEventListener('change', (e) => { estado.comparar = e.target.checked; aoMudar(); });
+$('variacao-b').addEventListener('change', (e) => { estado.variacaoB = e.target.value; aoMudar(); });
+$('pag-ant').addEventListener('click', () => { estado.paginaAtual -= 1; aoMudar(); });
+$('pag-prox').addEventListener('click', () => { estado.paginaAtual += 1; aoMudar(); });
+
+iniciar();
+</script>
+</body>
+</html>
