@@ -123,3 +123,21 @@ test('texto vazio gera uma página vazia', () => {
   assert.equal(paginas.length, 1);
   assert.equal(paginas[0].length, 0);
 });
+
+test('largura medida = desenhada: variacao e pressa não passam da margem + tolerância', () => {
+  const A5 = PAGINAS.A5;
+  const tol = 6 * 0.3;
+  for (const seed of [1, 2, 3, 4, 5]) {
+    const m = { ...mao, seed, variacao: 1, pressa: 1 };
+    for (const p of compor(longo.repeat(3), fontes, m, A5, { alinhamento: 'justificado' }).paginas)
+      for (const t of p) for (const [x] of t) assert.ok(x <= A5.largura - A5.margens.dir + tol, `x ${x}`);
+  }
+});
+
+test('glifo ausente: aspas curvas viram ASCII; o que falta gera aviso', () => {
+  const sem = compor('‘a’ …', fontes, mao, PAGINAS.A5);
+  assert.ok(!sem.avisos.some((a) => a.startsWith('glifo ausente')), sem.avisos.join('|'));
+  assert.deepEqual(sem.paginas, compor("'a' ...", fontes, mao, PAGINAS.A5).paginas);
+  const com = compor('a ☃ b', fontes, mao, PAGINAS.A5);
+  assert.ok(com.avisos.includes('glifo ausente: ☃'));
+});

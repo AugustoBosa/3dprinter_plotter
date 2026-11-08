@@ -8,7 +8,8 @@ export const PAGINAS = {
 };
 
 // Quebra o texto em linhas de saída (null = linha em branco) já com largura medida.
-function quebrar(texto, medir, espaco, W, avisos, tamanho) {
+// `gastar(s)` avanca o contador de ocorrencias quando a palavra e colocada (igual ao desenho).
+function quebrar(texto, medir, gastar, espaco, W, avisos) {
   const linhas = [];
   for (const entrada of texto.split('\n')) {
     if (entrada.trim() === '') { linhas.push(null); continue; }
@@ -23,11 +24,13 @@ function quebrar(texto, medir, espaco, W, avisos, tamanho) {
       if (atual.pals.length && atual.w + espaco + w <= W) {
         atual.pals.push(p);
         atual.w += espaco + w;
+        gastar(p);
         continue;
       }
       if (atual.pals.length) fecha(true);
       if (w <= W) {
         atual = { pals: [p], w };
+        gastar(p);
         continue;
       }
       // palavra maior que a linha: quebra por letra
@@ -40,6 +43,7 @@ function quebrar(texto, medir, espaco, W, avisos, tamanho) {
           pedaco = ''; wp = 0;
         }
         pedaco += ch; wp += a;
+        gastar(ch);
       }
       atual = { pals: [pedaco], w: wp };
     }
@@ -59,9 +63,28 @@ export function compor(texto, fontes, mao, pagina, opcoes = {}) {
   const tol = tamanho * 0.3;
   const avisos = [`tolerancia de limites: ${tol} mm`];
 
-  const medir = (s) => [...s].reduce((soma, ch) => soma + glifo(fontes, mao, ch, 0).adv * tamanho, 0);
+  // Glifo ausente: troca tipografica por ASCII se a fonte nao tem; se ainda faltar, avisa.
+  const tem = (ch) => mao.base.some((it) => fontes[it.fonte]?.glifos?.[ch]);
+  const ASCII = { '“': '"', '”': '"', '‘': "'", '’': "'", '…': '...', '—': '-', '–': '-' };
+  texto = texto.replace(/[“”‘’…—–]/g, (c) => (tem(c) ? c : ASCII[c]));
+  const faltam = new Set([...texto].filter((c) => c.trim() && !tem(c)));
+  for (const c of faltam) avisos.push(`glifo ausente: ${c}`);
+
+  // Mede com as mesmas ocorrencias que o desenho usara (variacao/pressa mudam a largura).
+  const cont = new Map();
+  const medir = (s) => {
+    const loc = new Map();
+    let w = 0;
+    for (const ch of s) {
+      const n = loc.get(ch) ?? 0;
+      loc.set(ch, n + 1);
+      w += glifo(fontes, mao, ch, (cont.get(ch) ?? 0) + n).adv * tamanho;
+    }
+    return w;
+  };
+  const gastar = (s) => { for (const ch of s) cont.set(ch, (cont.get(ch) ?? 0) + 1); };
   const espaco = (glifo(fontes, mao, ' ', 0).adv + mao.espacoPalavra) * tamanho;
-  const linhas = quebrar(texto, medir, espaco, W, avisos, tamanho);
+  const linhas = quebrar(texto, medir, gastar, espaco, W, avisos);
 
   const r = rng(mao.seed + '|tremor');
   const ocor = new Map();
