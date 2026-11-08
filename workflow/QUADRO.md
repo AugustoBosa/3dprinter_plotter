@@ -90,8 +90,8 @@ Estado: 78/78 testes. **Lote 1 (itens 1, 2 e 4) feito em `src/layout.js`**: troc
 7. `otimizar` guloso, início fixo em (0,0) (já marcado `ponytail:`); só mexer se a viagem pesar.
 
 ### Higiene
-- `arquivo/` = 147 MB, no `.gitignore`, sem backup fora da máquina.
-- README não cita `workflow/`, nem limite 210×210 / aviso "fora da mesa".
+- `arquivo/` LIMPO (2026-11-08): 147 MB → 3,7 MB. Ficou `vpype.toml`, `testes-fisicos/` e `modelos/`. O resto (scripts Python, mapas, cartas, originais de fontes) foi apagado por ser obsoleto.
+- README atualizado com `workflow/`, mesa 210×210 e aviso "fora da mesa".
 
 ### Ideias M10 (não pedidas)
 Exportar todas as páginas de uma vez; prévia com ordem de traçado e viagens; importar `.txt`.

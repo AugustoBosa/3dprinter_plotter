@@ -8,6 +8,10 @@ Gerador de caligrafia de traço único para uma impressora 3D (Anycubic i3 Mega 
 
 Abrir: https://augustobosa.github.io/3dprinter_plotter/ ou, local, `python -m http.server` na raiz e `http://localhost:8000`.
 
-Testes: `node --test` (Node 20+, sem dependências).
+Testes: `node --test` (Node 20+, sem dependências). A interface tem um roteiro manual em `test/ui-smoke.md`.
+
+Mesa: 210×210 mm. O G-code avisa quando um traço sai da mesa ("fora da mesa").
+
+`workflow/` guarda o quadro de tarefas (`QUADRO.md`) e a definição de pronto (`DOD.md`). `arquivo/` (fora do git) guarda só os arquivos físicos: G-code do suporte da caneta, testes de calibração e `vpype.toml`.
 
 43 fontes de traço único em `fontes/` (EMS, Hershey, Relief, Mistral, TwinSans) — licenças e créditos em `fontes/LICENCAS.md`.
