@@ -94,7 +94,7 @@ figure { margin: 0; min-width: 0; }
 <script type="module">
 import { parseFonte, FONTES } from './src/fonte.js';
 import { PAGINAS, compor } from './src/layout.js';
-import { PERFIL_PADRAO, svg } from './src/exportar.js';
+import { PERFIL_PADRAO, svg, otimizar } from './src/exportar.js';
 import { resolver, novoPersonagem } from './src/personagem.js';
 import { ajuda } from './src/ajuda.js';
 import * as pPersonagem from './src/ui-personagem.js';
@@ -118,6 +118,7 @@ const estado = {
   opcoes: { tamanho: 6, entrelinha: 1.6, alinhamento: 'esquerda' },
   perfil: structuredClone(PERFIL_PADRAO),
   otimizar: true,
+  trajeto: false,
   paginaAtual: 0,
   resultado: null,
   resultadoB: null,
@@ -166,10 +167,16 @@ function renderizar() {
   $('pag-prox').disabled = estado.paginaAtual >= total - 1;
 
   $('rotulo-a').textContent = `Variação: ${estado.variacao || 'mão base'}`;
-  $('previa').innerHTML = svg(estado.resultado.paginas[estado.paginaAtual] ?? [], estado.pagina);
+  // Com trajeto, a prévia mostra a mesma ordem do G-code (otimizada); sem, o desenho cru (barato).
+  const tracos = (r) => {
+    const t = r.paginas[estado.paginaAtual] ?? [];
+    return estado.trajeto && estado.otimizar ? otimizar(t) : t;
+  };
+  const opSvg = { trajeto: estado.trajeto };
+  $('previa').innerHTML = svg(tracos(estado.resultado), estado.pagina, opSvg);
   if (estado.comparar) {
     $('rotulo-b').textContent = `Variação: ${estado.variacaoB || 'mão base'}`;
-    $('previa-b').innerHTML = svg(estado.resultadoB.paginas[estado.paginaAtual] ?? [], estado.pagina);
+    $('previa-b').innerHTML = svg(tracos(estado.resultadoB), estado.pagina, opSvg);
   }
 
   const naoTolerancia = (a) => !String(a).startsWith('tolerancia de limites');

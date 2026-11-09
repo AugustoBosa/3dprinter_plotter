@@ -46,6 +46,8 @@ export const AJUDA = {
   header: 'Comandos G-code colocados no começo do arquivo, como aquecer ou zerar os eixos.',
   footer: 'Comandos G-code colocados no fim do arquivo, como estacionar a caneta.',
   otimizar: 'Reordena os traços para a caneta andar menos no ar. Não muda o desenho.',
+  trajeto: 'Mostra na prévia o caminho da caneta: tracejado = deslocamento no ar, verde = início de cada traço, vermelho = fim, número = ordem. Usa a ordem otimizada se "otimizar traços" estiver ligado.',
+  importarTxt: 'Carrega um arquivo .txt (até 200 KB) no lugar do texto atual.',
 };
 
 export const ROTULOS = {
@@ -93,6 +95,8 @@ export const ROTULOS = {
   header: 'início do arquivo (G-code)',
   footer: 'fim do arquivo (G-code)',
   otimizar: 'otimizar traços',
+  trajeto: 'mostrar trajeto da caneta',
+  importarTxt: 'importar arquivo .txt',
 };
 
 export function rotulo(chave) {

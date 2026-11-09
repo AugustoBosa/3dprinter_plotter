@@ -15,6 +15,7 @@ Atualizado pelo gerente a cada ciclo. Status de tarefa: pendente | em andamento 
 | M7 Sem presets, personagens na UI | FECHADO (ciclo 05, verificado no navegador pelo orquestrador) |
 | M8 Tabela de fontes | FECHADO (ciclo 05, verificado no navegador pelo orquestrador) |
 | M9 Ajuda "?" em cada configuração | FECHADO (ciclo 05, verificado no navegador pelo orquestrador) |
+| M10 2-opt, trajeto, exportar tudo, importar .txt | FECHADO (ciclo 06, verificado no navegador pelo orquestrador) |
 
 ## Itens do DoD comprovados
 
@@ -61,6 +62,7 @@ Atualizado pelo gerente a cada ciclo. Status de tarefa: pendente | em andamento 
 | 03 | OK: personagem e layout aceitos; M3 e M4 fechados; 62 pass / 0 fail |
 | 04 | OK: UI M6 entregue (4 ui-*.js + index.html) e espaçamento do Strahd corrigido; 65 pass / 0 fail; falta verificar M6 no navegador |
 | 05 | OK: Fase 2 entregue (M7-M9) em 2 lotes; personagens/ apagado; 76 pass / 0 fail; falta verificação no navegador |
+| 06 | OK: M10 feito pelo orquestrador (2-opt em janela, trajeto na prévia, baixar todas as páginas, importar .txt); 81 pass / 0 fail. Medido: `otimizar` A5 6 mm 87 ms, A4 6 mm 327 ms; A4 com letra de 3 mm (9600 traços) ~8 s (lento, só nesse extremo; o guloso O(n²) é a maior parte) |
 
 ## Retomada (2026-11-08)
 
@@ -93,8 +95,8 @@ Estado: 78/78 testes. **Lote 1 (itens 1, 2 e 4) feito em `src/layout.js`**: troc
 - `arquivo/` LIMPO (2026-11-08): 147 MB → 3,7 MB. Ficou `vpype.toml`, `testes-fisicos/` e `modelos/`. O resto (scripts Python, mapas, cartas, originais de fontes) foi apagado por ser obsoleto.
 - README atualizado com `workflow/`, mesa 210×210 e aviso "fora da mesa".
 
-### Ideias M10 (não pedidas)
-Exportar todas as páginas de uma vez; prévia com ordem de traçado e viagens; importar `.txt`.
+### Ideias M10 — FEITAS
+Exportar todas as páginas; prévia com ordem de traçado e viagens; importar `.txt`; 2-opt (item 7 acima resolvido).
 
 ### Verificado nesta varredura
 Nenhum traço com <2 pontos nos glifos (descarte em `valido()` não perde dados); CRLF no texto funciona.

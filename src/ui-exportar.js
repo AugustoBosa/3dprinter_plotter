@@ -14,10 +14,11 @@ const CAMPOS = [
   ['mesaY', 1],
 ];
 
-const tracosAtuais = (estado) => {
-  const tr0 = estado.resultado?.paginas[estado.paginaAtual] ?? [];
+const tracosDaPagina = (estado, i) => {
+  const tr0 = estado.resultado?.paginas[i] ?? [];
   return estado.otimizar ? otimizar(tr0) : tr0;
 };
+const tracosAtuais = (estado) => tracosDaPagina(estado, estado.paginaAtual);
 
 function baixar(conteudo, nome, tipo) {
   const url = URL.createObjectURL(new Blob([conteudo], { type: tipo }));
@@ -79,6 +80,14 @@ export function montar(elemento, estado, aoMudar) {
   });
   linha('otimizar', otim);
 
+  const traj = document.createElement('input');
+  traj.type = 'checkbox';
+  traj.addEventListener('change', () => {
+    estado.trajeto = traj.checked;
+    aoMudar();
+  });
+  linha('trajeto', traj);
+
   botao('Restaurar perfil padrão', () => {
     estado.perfil = structuredClone(PERFIL_PADRAO);
     aoMudar();
@@ -92,6 +101,14 @@ export function montar(elemento, estado, aoMudar) {
     baixar(gcode(tracosAtuais(estado), estado.pagina, estado.perfil).texto, `escrita-p${n}.gcode`, 'text/plain');
   });
 
+  // Um arquivo por página; sem zip (add se o navegador bloquear vários downloads).
+  const todas = (ext, tipo, gerar) => () => {
+    (estado.resultado?.paginas ?? []).forEach((_, i) =>
+      baixar(gerar(tracosDaPagina(estado, i)), `escrita-p${i + 1}.${ext}`, tipo));
+  };
+  botao('Baixar todos os SVG', todas('svg', 'image/svg+xml', (t) => svg(t, estado.pagina)));
+  botao('Baixar todos os G-code', todas('gcode', 'text/plain', (t) => gcode(t, estado.pagina, estado.perfil).texto));
+
   const resumo = document.createElement('p');
   const lista = document.createElement('ul');
   elemento.append(resumo, lista);
@@ -99,6 +116,7 @@ export function montar(elemento, estado, aoMudar) {
   return () => {
     for (const sync of sincs) sync();
     otim.checked = estado.otimizar;
+    traj.checked = estado.trajeto;
     lista.replaceChildren();
     if (!estado.resultado) {
       resumo.textContent = '—';

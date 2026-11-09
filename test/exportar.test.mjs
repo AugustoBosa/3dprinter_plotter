@@ -1,19 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { PERFIL_PADRAO, svg, otimizar, gcode } from '../src/exportar.js';
+import { PERFIL_PADRAO, svg, otimizar, gcode, viagem } from '../src/exportar.js';
 
 const raiz = new URL('../', import.meta.url);
 const toml = readFileSync(new URL('arquivo/vpype.toml', raiz), 'utf8');
 const lerToml = (chave) => toml.match(new RegExp(`${chave} = "(.*)"`))[1].replace(/\\n/g, '\n');
 const pagina = { largura: 210, altura: 210 };
-const dist = ([x1, y1], [x2, y2]) => Math.hypot(x2 - x1, y2 - y1);
-
-function viagem(tracos) {
-  let pos = [0, 0], total = 0;
-  for (const t of tracos) { total += dist(pos, t[0]); pos = t[t.length - 1]; }
-  return total;
-}
 
 test('PERFIL_PADRAO bate com vpype.toml e valores fixos', () => {
   assert.equal(PERFIL_PADRAO.header, lerToml('document_start'));
@@ -101,6 +94,30 @@ test('otimizar não aumenta a viagem', () => {
   const otimizado = otimizar(x);
   assert.ok(viagem(otimizado) <= viagem(x));
   assert.ok(viagem(otimizado) < viagem(x));
+});
+
+test('otimizar 2-opt: nunca pior que o original, preserva pontos e é determinístico', () => {
+  let s = 7;
+  const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  const x = Array.from({ length: 60 }, () => {
+    const a = [r() * 200, r() * 200];
+    return [a, [a[0] + r() * 8, a[1] + r() * 8]];
+  });
+  const o = otimizar(x, 0);
+  assert.ok(viagem(o) <= viagem(x));
+  assert.equal(o.length, 60);
+  assert.equal(o.flat().length, 120);
+  assert.deepEqual(otimizar(x, 0), o);
+});
+
+test('svg com trajeto desenha viagem e marcadores; sem trajeto fica igual', () => {
+  const t = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]];
+  const pg = { largura: 50, altura: 50 };
+  assert.equal(svg(t, pg), svg(t, pg, { trajeto: false }));
+  const s = svg(t, pg, { trajeto: true });
+  assert.equal(s.split('stroke-dasharray').length - 1, 2);
+  assert.equal(s.split('<circle').length - 1, 4);
+  assert.equal(s.split('<text').length - 1, 2);
 });
 
 test('otimizar não muta a entrada e descarta traços de 1 ponto', () => {

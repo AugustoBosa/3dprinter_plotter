@@ -108,6 +108,13 @@ Exceção ao contrato: `src/ui-*.js` podem usar DOM. Arquivos novos permitidos: 
 - [ ] Cada linha tem "Usar" (vira a base da mão) e "Misturar" (adiciona à mistura com peso 0.5); a prévia atualiza.
 - [ ] Cabeçalhos dos eixos e arquétipos com o ícone de ajuda (M9) usando os textos `ajuda` de `catalogo.js`.
 
+### M10 Trajeto, exportar tudo, importar .txt, 2-opt (pedido do usuário, 2026-11-08)
+- [x] `otimizar` aplica 2-opt (janela de 50 traços, 5 passadas) depois do guloso; nunca piora a viagem (`viagem()` exportada); testes em `test/exportar.test.mjs`.
+- [x] `svg(tracos, pagina, {trajeto})` desenha viagem tracejada, início verde, fim vermelho e número; sem a opção a saída não muda. Checkbox "mostrar trajeto" no painel Exportar.
+- [x] Botões "Baixar todos os SVG" / "Baixar todos os G-code": um arquivo por página.
+- [x] Importar `.txt` (até 200 KB) no painel Texto.
+- [x] Verificado no navegador: console limpo, 8 páginas → 8+8 downloads, arquivo grande recusado.
+
 ### M9 Ajuda em cada configuração
 - [ ] `src/ajuda.js` exporta `AJUDA = {[chave]: texto}` cobrindo: todas as chaves de IDENTIDADE e EXECUCAO, mistura/peso/mutar/seed, página, margens, tamanho, entrelinha, alinhamento, comparar, offset X/Y, Z escrita/levantada, velocidades, header/footer. Texto curto em pt-BR simples: o que faz, faixa de valores e efeito visível na letra.
 - [ ] `test/ajuda.test.mjs`: toda chave de IDENTIDADE e EXECUCAO tem texto não vazio.

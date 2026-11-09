@@ -100,9 +100,24 @@ export function montar(elemento, estado, aoMudar) {
     aoMudar();
   });
 
+  const arquivo = document.createElement('input');
+  arquivo.type = 'file';
+  arquivo.accept = '.txt,text/plain';
+  arquivo.addEventListener('change', async () => {
+    const f = arquivo.files[0];
+    arquivo.value = '';
+    const erro = document.getElementById('erro');
+    if (!f) return;
+    if (f.size > 200_000) { erro.textContent = 'Arquivo grande demais (máximo 200 KB).'; return; }
+    erro.textContent = '';
+    estado.texto = await f.text();
+    aoMudar();
+  });
+
   elemento.replaceChildren(
     titulo('Texto', 'texto'),
     textarea,
+    linha('importarTxt', arquivo),
     titulo('Página'),
     linha('pagina', selPagina),
     ...medidas.map((m) => m.linha),
