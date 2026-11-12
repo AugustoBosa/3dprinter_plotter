@@ -16,6 +16,7 @@ Atualizado pelo gerente a cada ciclo. Status de tarefa: pendente | em andamento 
 | M8 Tabela de fontes | FECHADO (ciclo 05, verificado no navegador pelo orquestrador) |
 | M9 Ajuda "?" em cada configuração | FECHADO (ciclo 05, verificado no navegador pelo orquestrador) |
 | M10 2-opt, trajeto, exportar tudo, importar .txt | FECHADO (ciclo 06, verificado no navegador pelo orquestrador) |
+| M11 Scrolls e grimórios de D&D (grimorio.html) | FECHADO (11 testes em test/grimorio.test.mjs; verificado no navegador; falta plotar em papel) |
 
 ## Itens do DoD comprovados
 
@@ -64,7 +65,15 @@ Atualizado pelo gerente a cada ciclo. Status de tarefa: pendente | em andamento 
 | 05 | OK: Fase 2 entregue (M7-M9) em 2 lotes; personagens/ apagado; 76 pass / 0 fail; falta verificação no navegador |
 | 06 | OK: M10 feito pelo orquestrador (2-opt em janela, trajeto na prévia, baixar todas as páginas, importar .txt); 81 pass / 0 fail. Medido: `otimizar` A5 6 mm 87 ms, A4 6 mm 327 ms; A4 com letra de 3 mm (9600 traços) ~8 s (lento, só nesse extremo; o guloso O(n²) é a maior parte) |
 
-## Retomada (2026-11-08)
+## Retomada (2026-11-10) — LEIA ESTA PRIMEIRA
+
+- Fechado: M1–M10, 81/81 testes, commit `3f39497` publicado em `main` (M10: 2-opt em janela, trajeto na prévia, baixar todas as páginas, importar `.txt`).
+- **Próxima ação já decidida:** aplicar a regra adaptativa em `otimizar` (2-opt completo até 2.000 traços, janela 50 acima). Passo a passo e medições em `workflow/experimentos/otimizar/RESULTADOS.md`. Algoritmo genético descartado.
+- Outras pendências: offset caneta↔bico (hardware, `offsetX/Y = 0`); plotter na Bambu P2S (futuro, `workflow/experimentos/p2s/PESQUISA.md`).
+- Experimentos (scripts e desenhos de teste: carta Tarokka, mapa Ravenloft) em `workflow/experimentos/otimizar/`; mapas vêm de `dnd/tools/5etools/.../img/adventure/CoS/`.
+- Não versionado ainda: `workflow/experimentos/` e a pasta `ilustracoes/` (esta não é minha; vem de outra sessão).
+
+## Retomada anterior (2026-11-08)
 
 - Tudo fechado: M1–M9, 76/76 testes, commit `e3098c4` publicado em `main` e no Pages (https://augustobosa.github.io/3dprinter_plotter/).
 - Nenhuma tarefa aberta. Próximo pedido do usuário vira M10 no `DOD.md` e roda no mesmo loop (gerente sonnet → workers haiku → orquestrador confere testes e navegador).
@@ -89,7 +98,9 @@ Estado: 78/78 testes. **Lote 1 (itens 1, 2 e 4) feito em `src/layout.js`**: troc
 4. ~~`EMSSpaceRocks` sem acentos~~ FEITO: a tabela de fontes mostra "sem acentos" (usa `SEM_ACENTOS` de `src/fonte.js`).
 5. ~~Sem teste de UI~~ FEITO: roteiro manual em `test/ui-smoke.md`, rodado no navegador (5/5 ok). Sem automação (ceiling: virar script Playwright se incomodar).
 6. ~~Desempenho~~ MEDIDO: `compor` com A4 cheia, 3 fontes, variacao=1: mediana 43 ms, pior 60 ms. Sem correção necessária.
-7. `otimizar` guloso, início fixo em (0,0) (já marcado `ponytail:`); só mexer se a viagem pesar.
+7. ~~`otimizar` guloso~~ 2-opt feito no M10 (janela 50). **DECISÃO TOMADA, FALTA APLICAR (2026-11-09):** regra adaptativa — 2-opt completo até 2.000 traços, janela 50 acima disso. Experimento, números e passo a passo em `workflow/experimentos/otimizar/RESULTADOS.md`. Algoritmo genético descartado. Início ainda fixo em (0,0).
+
+8. **Plotter na Bambu P2S (futuro, 2026-11-10):** viável, nada implementado. Pesquisa, suportes de caneta e plano em `workflow/experimentos/p2s/PESQUISA.md`.
 
 ### Higiene
 - `arquivo/` LIMPO (2026-11-08): 147 MB → 3,7 MB. Ficou `vpype.toml`, `testes-fisicos/` e `modelos/`. O resto (scripts Python, mapas, cartas, originais de fontes) foi apagado por ser obsoleto.

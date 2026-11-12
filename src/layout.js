@@ -88,7 +88,9 @@ export function compor(texto, fontes, mao, pagina, opcoes = {}) {
 
   const r = rng(mao.seed + '|tremor');
   const ocor = new Map();
-  const base = (k) => margens.topo + tamanho + k * tamanho * entrelinha + mao.queda * k;
+  // opcoes.topo: onde a primeira página começa (blocos empilhados); as seguintes voltam à margem.
+  let topo = opcoes.topo ?? margens.topo;
+  const base = (k) => topo + tamanho + k * tamanho * entrelinha + mao.queda * k;
 
   const paginas = [[]];
   let pag = paginas[0];
@@ -124,6 +126,7 @@ export function compor(texto, fontes, mao, pagina, opcoes = {}) {
       pag = [];
       paginas.push(pag);
       k = 0;
+      topo = margens.topo;
       if (L === null) continue;
     }
     if (L === null) { k++; continue; }
@@ -131,5 +134,6 @@ export function compor(texto, fontes, mao, pagina, opcoes = {}) {
     k++;
   }
 
-  return { paginas, avisos };
+  // fim: linha de base da última linha escrita na última página.
+  return { paginas, avisos, fim: k > 0 ? base(k - 1) : topo };
 }
